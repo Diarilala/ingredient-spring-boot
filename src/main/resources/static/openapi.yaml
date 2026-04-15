@@ -1,0 +1,296 @@
+openapi: 3.1.0
+info:
+  title: Title
+  description: Title
+  version: 1.0.0
+servers:
+  - url: 'http://127.0.0.1:8080'
+paths:
+  /ingredients:
+    get:
+      responses:
+        200:
+          description: list of ingredients in the database
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                    - category
+                    - price
+                  properties~
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    category:
+                      type: string
+                      enum:
+                        - VEGETABLE
+                        - DAIRY
+                        - MARINE
+                        - ANIMAL
+                        - OTHER
+                    price:
+                      type: number
+                      format: double
+                      example: 2500.00
+
+  /ingredients/{id}:
+    get:
+      description: Ingredient based on ID
+      parameters:
+        - identifier: id
+          in: path
+          required: true
+          description: Id of the ingredient
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Ingredient found
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - category
+                  - price
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  category:
+                    type: string
+                    enum:
+                      - VEGETABLE
+                      - DAIRY
+                      - MARINE
+                      - ANIMAL
+                      - OTHER
+                  price:
+                    type: number
+                    example: 2500.00
+        404:
+          description: Ingredient not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Ingredient.id=2 is not found"
+
+  /ingredients/ingredients/{id}/stock?at={temporal}&unit={unit}:
+    get:
+      description: stock of ingredient at a given time with a given unit
+      parameters:
+        - identifier: id
+          in: path
+          required: true
+          description: Id of the ingredient
+          schema:
+            type: integer
+        - time: at
+          in: query
+          required: true
+          description: the time of the needed stock
+          schema:
+            type: string
+            format: date-time
+        - ingredientUnit: unit
+          in: query
+          required: true
+          description: Unit of the stock
+          schema:
+            type: string
+            enum:
+              - PCS
+              - KG
+              - L
+      responses:
+        200:
+          description: Stock value
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - unit
+                  - stockValue
+                properties:
+                  unit:
+                    type: string
+                    enum:
+                      - PCS
+                      - KG
+                      - L
+                  stockValue:
+                    type: number
+                    example: 52.04
+        400:
+          description: Missing query parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Either mandatory query parameter 'at' or 'unit' is not provided"
+
+  /dishes:
+    get:
+      responses:
+        200:
+          description: List of dishes in the database
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - name
+                    - price
+                    - ingredients
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    price:
+                      type: integer
+                      example: 2500.00
+                    ingredients:
+                      type: array
+                      items:
+                        type: object
+                        required:
+                          - id
+                          - name
+                          - category
+                          - price
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          category:
+                            type: string
+                            enum:
+                              - VEGETABLE
+                              - DAIRY
+                              - MARINE
+                              - ANIMAL
+                              - OTHER
+                          price:
+                            type: number
+                            format: double
+                            example: 2500.00
+
+  /dishes/{id}/ingredients:
+    put:
+      description: update ingredient list of a dish
+      parameters:
+        - identifier: id
+          in: path
+          required: true
+          description: Id of the dish
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: updated list of ingredient
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required:
+                  - id
+                  - name
+                  - category
+                  - price
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  category:
+                    type: string
+                    enum:
+                      - VEGETABLE
+                      - DAIRY
+                      - MARINE
+                      - ANIMAL
+                      - OTHER
+                  price:
+                    type: number
+                    format: double
+                    example: 2500.00
+      responses:
+        200:
+          description: Ingredients of dish updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - price
+                  - ingredients
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  price:
+                    type: integer
+                    example: 2500.00
+                  ingredients:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - category
+                        - price
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        category:
+                          type: string
+                          enum:
+                            - VEGETABLE
+                            - DAIRY
+                            - MARINE
+                            - ANIMAL
+                            - OTHER
+                        price:
+                          type: number
+                          format: double
+                          example: 2500.00
+        400:
+          description: empty or missing request body
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "request body is required and must contain a list of ingredients"
+        404:
+          description: dish not found
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Dish.id=3 is not found"
+
